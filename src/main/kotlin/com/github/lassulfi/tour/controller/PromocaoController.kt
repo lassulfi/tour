@@ -1,7 +1,9 @@
 package com.github.lassulfi.tour.controller
 
+import com.github.lassulfi.tour.exception.PromocaoNotFoundException
 import com.github.lassulfi.tour.model.Promocao
 import com.github.lassulfi.tour.responses.CreatedResponse
+import com.github.lassulfi.tour.responses.ErrorMessage
 import com.github.lassulfi.tour.service.PromocaoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -18,11 +20,13 @@ class PromocaoController {
     lateinit var promocaoService: PromocaoService
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: Long): ResponseEntity<Promocao?> {
+    fun getById(@PathVariable id: Long): ResponseEntity<Any> {
         val promocao = this.promocaoService.getById(id)
-        val status = if(promocao == null) HttpStatus.NOT_FOUND else HttpStatus.OK
-
-        return ResponseEntity(promocao, status)
+        return if (promocao != null)
+            ResponseEntity(promocao, HttpStatus.OK)
+        else
+            ResponseEntity(ErrorMessage("Not Found", "Promoção ${id} não encontrada"),
+                    HttpStatus.NOT_FOUND)
     }
 
     @PostMapping
@@ -65,7 +69,7 @@ class PromocaoController {
     fun getAll(@RequestParam(required = false, defaultValue = "", value = "local") localFilter: String):
             ResponseEntity<List<Promocao>> {
         val promocoes = promocaoService.getByLocal(localFilter)
-        var status = if(promocoes.size == 0) HttpStatus.NO_CONTENT else HttpStatus.OK
+        var status = if(promocoes.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.OK
 
         return ResponseEntity(promocoes, status)
 
