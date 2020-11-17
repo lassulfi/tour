@@ -31,12 +31,12 @@ class PromocaoController {
 
     @PostMapping
     fun create(@RequestBody promocao: Promocao): ResponseEntity<CreatedResponse> {
-        promocaoService.create(promocao)
+        val p = promocaoService.create(promocao)
 
         val uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(promocao.id)
+                .buildAndExpand(p.id)
                 .toUri();
 
         val body = CreatedResponse("success", Date())
@@ -66,12 +66,17 @@ class PromocaoController {
     }
 
     @GetMapping
-    fun getAll(@RequestParam(required = false, defaultValue = "", value = "local") localFilter: String):
+    fun getAll(
+            @RequestParam(required = false, defaultValue = "1", value = "_offset") offset: Int,
+            @RequestParam(required = false, defaultValue = "3", value = "_limit") limit: Int,
+            @RequestParam(required = false, defaultValue = "", value = "sort") sortBy: String, @RequestParam(required = false) maiorPreco: String):
             ResponseEntity<List<Promocao>> {
-        val promocoes = promocaoService.getByLocal(localFilter)
-        var status = if(promocoes.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.OK
+        val promocoes = if (sortBy != null) promocaoService.getAll(offset, limit, sortBy) else promocaoService.getAll(offset, limit, null)
+        var status = if(promocoes.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.PARTIAL_CONTENT
 
         return ResponseEntity(promocoes, status)
-
     }
+
+    @GetMapping("/total-registros")
+    fun count(): ResponseEntity<Map<String, Long>> = ResponseEntity.ok(mapOf("total_registros" to this.promocaoService.count()))
 }
