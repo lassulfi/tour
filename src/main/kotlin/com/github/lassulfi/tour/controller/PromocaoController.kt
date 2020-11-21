@@ -69,7 +69,8 @@ class PromocaoController {
     fun getAll(
             @RequestParam(required = false, defaultValue = "1", value = "_offset") offset: Int,
             @RequestParam(required = false, defaultValue = "3", value = "_limit") limit: Int,
-            @RequestParam(required = false, defaultValue = "", value = "sort") sortBy: String, @RequestParam(required = false) maiorPreco: String):
+            @RequestParam(required = false, defaultValue = "", value = "sort") sortBy: String,
+            @RequestParam(required = false, defaultValue = "", value = "maior_preco") maiorPreco: String):
             ResponseEntity<List<Promocao>> {
         val promocoes = if (sortBy != null) promocaoService.getAll(offset, limit, sortBy) else promocaoService.getAll(offset, limit, null)
         var status = if(promocoes.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.PARTIAL_CONTENT

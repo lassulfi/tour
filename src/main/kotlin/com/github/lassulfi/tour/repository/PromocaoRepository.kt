@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 @Repository
 interface PromocaoRepository: PagingAndSortingRepository<Promocao, Long> {
 
-    @Query(value = "select p from Promocao p where p.preco <= :value and p.qtde_de_dias >= :dias")
+    @Query(value = "select p from Promocao p where p.preco <= :valor and p.qtdDias >= :dias")
     fun findByPrecoLessThen(@Param("valor") valor: Double, @Param("dias") dias: Int): List<Promocao>
 
     @Query(value = "select p from Promocao p where p.local  in :names")
@@ -20,5 +20,5 @@ interface PromocaoRepository: PagingAndSortingRepository<Promocao, Long> {
     @Query(value = "update Promocao p set p.preco = :valor where p.local = :local")
     @Transactional
     @Modifying
-    fun updateByLocal(@Param("valor") preco: Double, @Param("local") local: String)
+    fun updatePrecoByLocal(@Param("valor") preco: Double, @Param("local") local: String)
 }
